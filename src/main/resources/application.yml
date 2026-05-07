@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: spring-ai-log-rag
+
+  # ── Elasticsearch ──────────────────────────────────────────────────────────
+  elasticsearch:
+    uris: http://localhost:9200
+    connection-timeout: 5s
+    socket-timeout: 30s
+
+  # ── PostgreSQL / PGVector ──────────────────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:5433/vectordb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+
+  # ── Spring AI ─────────────────────────────────────────────────────────────
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      init:
+        pull-model-strategy: when_missing
+        timeout: 10m
+      # Modèle de chat : qwen2.5:3b — plus rapide (~5-10s vs 30s+ pour 7b)
+      chat:
+        model: qwen2.5:3b
+        options:
+          temperature: 0.2
+          num-ctx: 2048
+          top-p: 0.9
+      # Modèle d'embedding : nomic-embed-text → 768 dimensions
+      embedding:
+        model: nomic-embed-text
+
+    # ── PGVector Store ───────────────────────────────────────────────────────
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW          # Hierarchical Navigable Small World — optimal pour RAG
+        distance-type: COSINE_DISTANCE
+        dimensions: 768           # nomic-embed-text produit des vecteurs de 768 dims
+
+server:
+  port: 8080
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.bmax.lograg: DEBUG
+    org.springframework.ai: INFO
+    org.springframework.ai.vectorstore: DEBUG
+    org.springframework.data.elasticsearch: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

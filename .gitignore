@@ -1,0 +1,14 @@
+target/
+*.log
+*.jar
+!**/src/main/**
+!**/src/test/**
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.DS_Store
+spring-ai-log-rag.iml

@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+
+  # ─── Elasticsearch dédié aux logs applicatifs ────────────────────────────
+  elasticsearch-rag:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: elasticsearch-log-rag
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=log-rag-cluster
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-log-rag-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  # ─── Kibana pour visualiser les logs ─────────────────────────────────────
+  kibana-rag:
+    image: docker.elastic.co/kibana/kibana:8.15.3
+    container_name: kibana-log-rag
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-rag:9200
+    ports:
+      - "5602:5601"
+    depends_on:
+      elasticsearch-rag:
+        condition: service_healthy
+
+  # ─── PGVector pour les embeddings sémantiques ────────────────────────────
+  pgvector-rag:
+    image: pgvector/pgvector:pg16
+    container_name: pgvector-log-rag
+    environment:
+      - POSTGRES_DB=vectordb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgvector-log-rag-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vectordb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  es-log-rag-data:
+  pgvector-log-rag-data:
