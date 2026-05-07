@@ -1,6 +1,6 @@
 # Spring AI Log RAG
 
-> **Assistant IA personnel pour l'analyse de logs des differentes applications en temps reel**  
+> **Assistant IA pour l'analyse de logs des differentes applications en temps reel**  
 > Architecture RAG hybride : recherche par mots-clés (Elasticsearch) + recherche sémantique (PGVector) → génération de réponses contextualisées via un LLM local (Ollama / qwen2.5:3b).
 
 ---
@@ -28,7 +28,7 @@
 ## Vue d'ensemble
 
 Spring AI Log RAG est un assistant d'analyse de logs applicatifs qui combine deux stratégies de recherche complémentaires pour enrichir le contexte fourni à un LLM local :
-
+Il permet de realiser un monitoring sur les applications en temps reel et permet d'analiser les incidents et proposer des corrections.
 ```
 Question utilisateur
         │
