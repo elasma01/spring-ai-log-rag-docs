@@ -1,6 +1,6 @@
 # Spring AI Log RAG
 
-> **Assistant IA personnel pour l'analyse de logs Spring Boot**  
+> **Assistant IA personnel pour l'analyse de logs des differentes applications en temps reel**  
 > Architecture RAG hybride : recherche par mots-clés (Elasticsearch) + recherche sémantique (PGVector) → génération de réponses contextualisées via un LLM local (Ollama / qwen2.5:3b).
 
 ---
